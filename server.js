@@ -9,7 +9,7 @@ app.use(express.static("public"));
 
 // conexão banco (Supabase)
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.SUPABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
