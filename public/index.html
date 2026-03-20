@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Help Desk — Registro de Chamados (XLS)</title>
+  <title>Help Desk — Registro de Chamados</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -645,8 +645,11 @@
         <div class="headline reveal" style="animation-delay:.02s">
           <h2>Controle de Chamados de TI, sem complicação.</h2>
           <p>
-            Registre os seus chamado aguarde que o setor de Tecnologia da empresa ira atende-lo da melhor forma possivél. o App esta em fase de teste. o backend esta em desenvolvimento.
-          </p>
+  <strong>1.</strong> Registre seu chamado<br>
+  <strong>2.</strong> Acompanhe o andamento na tabela<br>
+  <strong>3.</strong> Exporte ou imprima quando necessário<br><br>
+  O sistema está em fase de testes. Em breve com integração completa ao backend.
+  </p>
           <div class="metaRow">
             <span class="badge"><span class="dot" aria-hidden="true"></span> Campos padronizados: Filial, Setor, Status, Prioridade</span>
             <span class="kbd">Dica: use Ctrl/Cmd + F para achar na tabela</span>
@@ -1255,7 +1258,7 @@
 });
 carregarChamados();
 async function carregarChamados() {
-  const res = await fetch("/chamados");
+  const res = await fetch("https://renovahelpdesk-1.onrender.com/chamados");
   tickets = await res.json();
   render();
 }
