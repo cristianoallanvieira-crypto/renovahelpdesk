@@ -1246,13 +1246,19 @@
       form.addEventListener("submit", (e)=>{
         e.preventDefault();
         if(!validateForm()) return;
-
         const t = getFormTicket();
+</> JavaScript
         await fetch("/chamados", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify(t)
 });
+carregarChamados();
+async function carregarChamados() {
+  const res = await fetch("/chamados");
+  tickets = await res.json();
+  render();
+}
 async function carregarChamados() {
   const res = await fetch("/chamados");
   tickets = await res.json();
@@ -1260,6 +1266,7 @@ async function carregarChamados() {
 }
 // save();
 // localStorage
+
 carregarChamados();
         render();
         toastify("Chamado registrado e salvo localmente.", "ok");
