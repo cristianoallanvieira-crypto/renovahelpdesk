@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Help Desk — Registro de Chamados (XLS)</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Aesthetic: "Swiss x Industrial" (claro, alto contraste, detalhes em verde-azulado) */
+      --bg: #0b0f14;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.09);
+      --stroke: rgba(255,255,255,.12);
+      --stroke2: rgba(255,255,255,.18);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --faint: rgba(255,255,255,.55);
+      --accent: #38f2c5; /* verde-azulado */
+      --accent2:#b7ff4a; /* lima (micro-detalhes) */
+      --danger:#ff4d6d;
+      --warn:#ffd166;
+      --ok:#2fe67a;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 12px;
+      --max: 1200px;
+    }
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 800px at 10% 10%, rgba(56,242,197,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(183,255,74,.10), transparent 55%),
+        radial-gradient(1000px 700px at 60% 110%, rgba(56,242,197,.12), transparent 60%),
+        linear-gradient(180deg, #070a0f 0%, #0b0f14 55%, #070a0f 100%);
+      overflow-x:hidden;
+    }
+
+    a{ color: inherit; }
+    .container{
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    /* Subtle grid texture */
+    .gridfx{
+      position: fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 68px 68px;
+      mask-image: radial-gradient(900px 650px at 35% 25%, black 45%, transparent 70%);
+      z-index:0;
+    }
+
+    header{
+      position: sticky;
+      top:0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(7,10,15,.82), rgba(7,10,15,.40));
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 18px;
+      padding: 16px 0;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 240px;
+    }
+    .logo{
+      width: 38px; height:38px;
+      border-radius: 12px;
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(255,255,255,.35), transparent 60%),
+        conic-gradient(from 210deg, rgba(56,242,197,.95), rgba(183,255,74,.85), rgba(56,242,197,.95));
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      position: relative;
+      border: 1px solid rgba(255,255,255,.22);
+    }
+    .logo:after{
+      content:"";
+      position:absolute;
+      inset: 8px;
+      border-radius: 10px;
+      background: rgba(10,14,20,.55);
+      border: 1px solid rgba(255,255,255,.14);
+    }
+    .brand h1{
+      font-family: Fraunces, serif;
+      font-weight: 700;
+      letter-spacing: .2px;
+      font-size: 18px;
+      margin:0;
+      line-height:1.05;
+    }
+    .brand p{
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .2px;
+    }
+    .navActions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .pill strong{ color: var(--text); font-weight: 600; }
+
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: .2px;
+      cursor:pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      user-select:none;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
+    }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(56,242,197,.22), rgba(56,242,197,.10));
+      border-color: rgba(56,242,197,.42);
+      box-shadow: 0 22px 52px rgba(56,242,197,.10);
+    }
+    .btn.primary:hover{
+      background: linear-gradient(180deg, rgba(56,242,197,.28), rgba(56,242,197,.12));
+      border-color: rgba(56,242,197,.58);
+    }
+
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(255,77,109,.18), rgba(255,77,109,.08));
+      border-color: rgba(255,77,109,.45);
+    }
+
+    .btn svg{ width: 18px; height: 18px; opacity:.9; }
+
+    main{ position: relative; z-index: 1; }
+
+    .hero{
+      padding: clamp(22px, 3vw, 34px) 0 18px;
+    }
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    @media (max-width: 980px){
+      .heroGrid{ grid-template-columns: 1fr; }
+      .brand{ min-width: unset; }
+    }
+
+    .headline{
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(700px 360px at 20% 0%, rgba(56,242,197,.22), transparent 55%),
+        radial-gradient(700px 360px at 90% 30%, rgba(183,255,74,.12), transparent 60%),
+        rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 2.4vw, 26px);
+      position: relative;
+      overflow:hidden;
+    }
+    .headline:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        linear-gradient(90deg, transparent 0%, rgba(255,255,255,.09) 45%, transparent 90%);
+      transform: translateX(-60%);
+      opacity: .35;
+      filter: blur(0.2px);
+      animation: sheen 8s ease-in-out infinite;
+      pointer-events:none;
+    }
+    @keyframes sheen{
+      0%{ transform: translateX(-60%); }
+      50%{ transform: translateX(60%); }
+      100%{ transform: translateX(-60%); }
+    }
+    .headline h2{
+      font-family: Fraunces, serif;
+      font-size: clamp(26px, 3.1vw, 44px);
+      line-height: 1.06;
+      margin: 0 0 10px;
+      letter-spacing: .2px;
+    }
+    .headline p{
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 64ch;
+    }
+    .metaRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+
+    .stats{
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      padding: clamp(18px, 2.4vw, 22px);
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-content: start;
+    }
+    .stat{
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      position: relative;
+      overflow:hidden;
+    }
+    .stat:after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background: radial-gradient(220px 80px at 20% 0%, rgba(56,242,197,.18), transparent 60%);
+      opacity:.7;
+      pointer-events:none;
+    }
+    .stat .label{
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .18px;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+    .stat .value{
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      position: relative;
+      z-index: 1;
+    }
+    .stat .hint{
+      margin-top: 8px;
+      color: var(--faint);
+      font-size: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dot{
+      width: 8px; height:8px; border-radius:999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(56,242,197,.14);
+    }
+    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 5px rgba(255,209,102,.14); }
+    .dot.danger{ background: var(--danger); box-shadow: 0 0 0 5px rgba(255,77,109,.14); }
+    .dot.ok{ background: var(--ok); box-shadow: 0 0 0 5px rgba(47,230,122,.14); }
+
+    section{
+      padding: 14px 0 26px;
+    }
+
+    .panel{
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panelHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 16px;
+      padding: 18px clamp(16px, 2vw, 22px);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), transparent);
+    }
+    .panelHead h3{
+      margin:0;
+      font-family: Fraunces, serif;
+      letter-spacing: .2px;
+      font-size: 18px;
+    }
+    .panelHead p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 70ch;
+    }
+    .panelBody{
+      padding: 18px clamp(16px, 2vw, 22px) 22px;
+    }
+
+    .formGrid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+    .field{ grid-column: span 3; }
+    .field.w4{ grid-column: span 4; }
+    .field.w6{ grid-column: span 6; }
+    .field.w8{ grid-column: span 8; }
+    .field.w12{ grid-column: span 12; }
+
+    @media (max-width: 980px){
+      .field, .field.w4, .field.w6, .field.w8{ grid-column: span 12; }
+      .stats{ grid-template-columns: 1fr; }
+    }
+
+    label{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      font-size: 12px;
+      letter-spacing: .18px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .req{
+      color: rgba(255,255,255,.75);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(255,255,255,.05);
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline: none;
+      transition: border-color .18s ease, transform .18s ease, background .18s ease, box-shadow .18s ease;
+      font-size: 14px;
+    }
+    textarea{ min-height: 110px; resize: vertical; }
+    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.45); }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(56,242,197,.55);
+      box-shadow: 0 0 0 4px rgba(56,242,197,.12);
+      background: rgba(0,0,0,.28);
+    }
+
+    .formActions{
+      margin-top: 14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+    }
+    .leftActions, .rightActions{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+    }
+    .helper{
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 1.45;
+      max-width: 78ch;
+    }
+
+    /* Table */
+    .tableWrap{
+      overflow:auto;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+    thead th{
+      text-align:left;
+      font-size: 12px;
+      letter-spacing: .18px;
+      color: rgba(255,255,255,.78);
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      white-space: nowrap;
+    }
+    tbody td{
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+      vertical-align: top;
+    }
+    tbody tr:hover{
+      background: rgba(255,255,255,.04);
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      white-space: nowrap;
+      color: rgba(255,255,255,.86);
+    }
+    .chip.low .miniDot{ background: var(--ok); }
+    .chip.med .miniDot{ background: var(--warn); }
+    .chip.high .miniDot{ background: var(--danger); }
+    .miniDot{
+      width: 8px; height: 8px; border-radius: 99px;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+    }
+
+    .rowActions{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      justify-content:flex-end;
+      white-space: nowrap;
+    }
+    .iconBtn{
+      appearance:none;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      cursor:pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      display:inline-grid;
+      place-items:center;
+    }
+    .iconBtn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.22);
+    }
+    .iconBtn:active{ transform: translateY(0px) scale(.99); }
+    .iconBtn svg{ width: 18px; height: 18px; }
+
+    .filters{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr .8fr .8fr;
+      gap: 10px;
+    }
+    @media (max-width: 980px){
+      .filters{ grid-template-columns: 1fr; }
+      table{ min-width: 980px; }
+    }
+
+    .foot{
+      padding: 26px 0 40px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+    }
+
+    /* Motion: stagger reveal */
+    .reveal{ opacity:0; transform: translateY(10px); }
+    .reveal.in{
+      animation: rise .7s cubic-bezier(.2,.85,.2,1) forwards;
+    }
+    @keyframes rise{
+      to{ opacity:1; transform: translateY(0px); }
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(10,14,20,.72);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      color: rgba(255,255,255,.9);
+      padding: 10px 12px;
+      border-radius: 14px;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      max-width: min(560px, calc(100% - 24px));
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 100;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+    .toast .bar{
+      width: 10px; height: 10px; border-radius: 99px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(56,242,197,.16);
+      flex: 0 0 auto;
+    }
+    .toast .msg{
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(255,255,255,.85);
+    }
+    .toast .msg strong{ color: rgba(255,255,255,.95); }
+
+    /* Print */
+    @media print{
+      header, .hero, .formPanel, .controlsPanel, .foot, .toast{ display:none !important; }
+      body{ background: #fff; color:#111; }
+      .panel{ box-shadow:none; border:1px solid #ddd; background:#fff; }
+      .tableWrap{ border:1px solid #ddd; background:#fff; }
+      table{ min-width: unset; }
+      thead th{ position: static; background:#f3f3f3; color:#111; }
+      tbody td{ color:#111; }
+    }
+  </style>
+</head>
+<body>
+  <div class="gridfx" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand" aria-label="Marca">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>Help Desk - Renova Engenharia</h1>
+            <p>Registre seu chamado <strong></strong></p>
+          </div>
+        </div>
+
+        <div class="navActions">
+          <div class="pill" title="Armazenamento local">
+            <span class="dot ok" aria-hidden="true"></span>
+            <span>Salvo no navegador: <strong id="storageStatus">ativo</strong></span>
+          </div>
+
+          <button class="btn" id="btnExport" type="button" title="Exportar para Excel (.xls)">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 3v10m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 14v4a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Exportar .xls
+          </button>
+
+          <button class="btn danger" id="btnClear" type="button" title="Apagar todos os chamados (local)">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 3h6m-8 4h10m-9 0 1 14h6l1-14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Limpar
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="heroGrid">
+        <div class="headline reveal" style="animation-delay:.02s">
+          <h2>Controle de Chamados de TI, sem complicação.</h2>
+          <p>
+            Registre os seus chamado aguarde que o setor de Tecnologia da empresa ira atende-lo da melhor forma possivél. o App esta em fase de teste. o backend esta em desenvolvimento.
+          </p>
+          <div class="metaRow">
+            <span class="badge"><span class="dot" aria-hidden="true"></span> Campos padronizados: Filial, Setor, Status, Prioridade</span>
+            <span class="kbd">Dica: use Ctrl/Cmd + F para achar na tabela</span>
+          </div>
+        </div>
+
+        <aside class="stats reveal" style="animation-delay:.08s" aria-label="Resumo">
+          <div class="stat">
+            <div class="label">Total de chamados</div>
+            <div class="value" id="statTotal">0</div>
+            <div class="hint">Inclui todos os status</div>
+          </div>
+          <div class="stat">
+            <div class="label">Abertos / Em andamento</div>
+            <div class="value" id="statOpen">0</div>
+            <div class="hint">Status ≠ Resolvido/Fechado</div>
+          </div>
+          <div class="stat">
+            <div class="label">Alta prioridade</div>
+            <div class="value" id="statHigh">0</div>
+            <div class="hint">Prioridade = Alta</div>
+          </div>
+          <div class="stat">
+            <div class="label">Última exportação</div>
+            <div class="value" id="statExport">—</div>
+            <div class="hint">Marca local (não envia dados)</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="formPanel reveal" style="animation-delay:.12s">
+      <div class="panel">
+        <div class="panelHead">
+          <div>
+            <h3>Novo chamado</h3>
+            <p>Preencha os campos abaixo. Você pode editar um chamado depois direto na tabela.</p>
+          </div>
+          <div class="badge" title="Obrigatoriedade">
+            <span class="dot warn" aria-hidden="true"></span>
+            <span>Campos com <strong>Obrigatório</strong> precisam ser preenchidos</span>
+          </div>
+        </div>
+
+        <div class="panelBody">
+          <form id="ticketForm" novalidate>
+            <div class="formGrid">
+              <div class="field w4">
+                <label for="Data_Abertura">Data_Abertura <span class="req">Obrigatório</span></label>
+                <input id="Data_Abertura" name="Data_Abertura" type="date" required />
+              </div>
+
+              <div class="field w4">
+                <label for="Filial">Filial <span class="req">Obrigatório</span></label>
+                <select id="Filial" name="Filial" required>
+                  <option value="" selected disabled>Selecione…</option>
+                  <option>PE-Matriz</option>
+                  <option>PE-IAT</option>
+                  <option>AL</option>
+                  <option>PB</option>
+                  <option>CE</option>
+                </select>
+              </div>
+
+              <div class="field w4">
+                <label for="Setor">Setor <span class="req">Obrigatório</span></label>
+                <select id="Setor" name="Setor" required>
+                  <option value="" selected disabled>Selecione…</option>
+                  <option>Ativação</option>
+                  <option>Engenharia</option>
+                  <option>Acesso</option>
+                  <option>Solar</option>
+                  <option>Administrativo</option>
+                  <option>Projetos</option>
+                  <option>MDU</option>
+                  <option>IAT</option>
+                </select>
+              </div>
+
+              <div class="field w4">
+                <label for="Colaborador">Colaborador <span class="req">Obrigatório</span></label>
+                <input id="Colaborador" name="Colaborador" type="text" placeholder="Ex.: Maria Santos" required />
+              </div>
+
+              <div class="field w4">
+                <label for="Categoria">Categoria <span class="req">Obrigatório</span></label>
+                <input id="Categoria" name="Categoria" type="text" placeholder="Ex.: E-mail, VPN, Sistema, Rede…" required />
+              </div>
+
+              <div class="field w4">
+                <label for="Prioridade">Prioridade <span class="req">Obrigatório</span></label>
+                <select id="Prioridade" name="Prioridade" required>
+                  <option value="" selected disabled>Selecione…</option>
+                  <option>Baixa</option>
+                  <option>Média</option>
+                  <option>Alta</option>
+                </select>
+              </div>
+
+              <div class="field w4">
+                <label for="Status">Status <span class="req">Obrigatório</span></label>
+                <select id="Status" name="Status" required>
+                  <option value="" selected disabled>Selecione…</option>
+                  <option>Aberto</option>
+                  <option>Em andamento</option>
+                  <option>Aguardando usuário</option>
+                  <option>Aguardando fornecedor</option>
+                  <option>Resolvido</option>
+                  <option>Fechado</option>
+                </select>
+              </div>
+
+              <div class="field w4">
+                <label for="Responsavel_TI">Responsável TI <span class="req">Obrigatório</span></label>
+                <input id="Responsavel_TI" name="Responsavel_TI" type="text" placeholder="Ex.: TI - João" required />
+              </div>
+
+              <div class="field w12">
+                <label for="Descricao_do_Problema">Descrição do Problema <span class="req">Obrigatório</span></label>
+                <textarea id="Descricao_do_Problema" name="Descricao_do_Problema" placeholder="Descreva o problema, impacto, tentativas e contexto…" required></textarea>
+              </div>
+
+              <!-- NOVO: Solução -->
+              <div class="field w12">
+                <label for="Solucao">Solução</label>
+                <textarea id="Solucao" name="Solucao" placeholder="Descreva a solução aplicada (quando houver)…"></textarea>
+              </div>
+            </div>
+
+            <div class="formActions">
+              <div class="leftActions">
+                <button class="btn primary" type="submit" id="btnAdd">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Registrar chamado
+                </button>
+
+                <button class="btn" type="button" id="btnReset">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M21 12a9 9 0 1 1-3-6.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M21 3v7h-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                  Limpar formulário
+                </button>
+              </div>
+
+              <div class="rightActions">
+                <div class="helper">
+                  <strong>Armazenamento:</strong> os dados do seu Chamado seram enviado para o setor de TI,
+                  <strong> </strong>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="controlsPanel reveal" style="animation-delay:.16s">
+      <div class="panel">
+        <div class="panelHead">
+          <div>
+            <h3>Chamados registrados</h3>
+            <p>Use os filtros para localizar rapidamente. Clique em “editar” para alterar status, responsável, etc.</p>
+          </div>
+          <div class="badge">
+            <span class="dot ok" aria-hidden="true"></span>
+            <span id="countLabel"><strong>0</strong> exibidos</span>
+          </div>
+        </div>
+
+        <div class="panelBody">
+          <div class="filters" role="region" aria-label="Filtros">
+            <div>
+              <label for="q">Busca (texto)</label>
+              <input id="q" type="search" placeholder="Nome, categoria, descrição, responsável…" />
+            </div>
+
+            <div>
+              <label for="fFilial">Filial</label>
+              <select id="fFilial">
+                <option value="">Todas</option>
+                <option>PE</option>
+                <option>CE</option>
+                <option>AL</option>
+                <option>PB</option>
+                <option>PE-IAT</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="fStatus">Status</label>
+              <select id="fStatus">
+                <option value="">Todos</option>
+                <option>Aberto</option>
+                <option>Em andamento</option>
+                <option>Aguardando usuário</option>
+                <option>Aguardando fornecedor</option>
+                <option>Resolvido</option>
+                <option>Fechado</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="fPrioridade">Prioridade</label>
+              <select id="fPrioridade">
+                <option value="">Todas</option>
+                <option>Baixa</option>
+                <option>Média</option>
+                <option>Alta</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="tableWrap" role="region" aria-label="Tabela de chamados">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:110px">Data_Abertura</th>
+                  <th style="width:88px">Filial</th>
+                  <th style="width:130px">Setor</th>
+                  <th style="width:170px">Colaborador</th>
+                  <th style="width:150px">Categoria</th>
+                  <th>Descrição do Problema</th>
+                  <th>Solução</th>
+                  <th style="width:120px">Prioridade</th>
+                  <th style="width:160px">Status</th>
+                  <th style="width:170px">Responsável TI</th>
+                  <th style="width:120px; text-align:right">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="formActions" style="margin-top:0">
+            <div class="leftActions">
+              <button class="btn" type="button" id="btnSeed" title="Cria alguns exemplos locais">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M4 19c7-1 10-7 10-14 4 6 4 12-1 16-2 2-5 2-9-2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Inserir exemplos
+              </button>
+
+              <button class="btn" type="button" id="btnPrint" title="Imprimir / PDF">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M7 8V4h10v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M6 17H5a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M7 14h10v6H7v-6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Imprimir
+              </button>
+            </div>
+
+            <div class="rightActions">
+              <span class="helper">
+                Exportação gera um arquivo <strong>.xls</strong> compatível com Excel (tabela HTML). Para “.xlsx” real, seria melhor usar uma lib (ou backend).
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="panel" style="padding:14px 16px; background: rgba(255,255,255,.03);">
+        <div style="display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;">
+          <div style="max-width:88ch;">
+            <strong style="color:rgba(255,255,255,.85)">Nota importante:</strong>
+            Este arquivo é um app 100% frontend. Ele não envia dados para um servidor. Os registros ficam no seu navegador.
+          </div>
+          <div class="badge" title="Atalhos sugeridos">
+            <span class="dot" aria-hidden="true"></span>
+            <span><strong>Fluxo:</strong> Registrar Filtrar Exportar .xls</span> → →
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+    <div class="bar" aria-hidden="true"></div>
+    <div class="msg" id="toastMsg"></div>
+  </div>
+
+  <script>
+    (function(){
+      const LS_KEY = "helpdesk_tickets_v1";
+      const LS_EXPORT = "helpdesk_last_export_v1";
+      /** @type {Array<Ticket>} */
+      let tickets = [];
+
+      const form = document.getElementById("ticketForm");
+      const tbody = document.getElementById("tbody");
+      const q = document.getElementById("q");
+      const fFilial = document.getElementById("fFilial");
+      const fStatus = document.getElementById("fStatus");
+      const fPrioridade = document.getElementById("fPrioridade");
+
+      const statTotal = document.getElementById("statTotal");
+      const statOpen = document.getElementById("statOpen");
+      const statHigh = document.getElementById("statHigh");
+      const statExport = document.getElementById("statExport");
+
+      const countLabel = document.getElementById("countLabel");
+      const btnExport = document.getElementById("btnExport");
+      const btnClear = document.getElementById("btnClear");
+      const btnReset = document.getElementById("btnReset");
+      const btnSeed = document.getElementById("btnSeed");
+      const btnPrint = document.getElementById("btnPrint");
+
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toastMsg");
+
+      /** @typedef {{
+       * id: string,
+       * Data_Abertura: string,
+       * Filial: string,
+       * Setor: string,
+       * Colaborador: string,
+       * Categoria: string,
+       * Descricao_do_Problema: string,
+       * Solucao?: string,
+       * Prioridade: "Baixa"|"Média"|"Alta",
+       * Status: string,
+       * Responsavel_TI: string,
+       * createdAt: number,
+       * updatedAt: number
+       * }} Ticket */
+
+      function uid(){
+        return "T" + Math.random().toString(16).slice(2) + Date.now().toString(16);
+      }
+      function todayISO(){
+        const d = new Date();
+        const pad = (n)=> String(n).padStart(2,"0");
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      }
+      function escapeHtml(str){
+        return String(str)
+          .replaceAll("&","&amp;")
+          .replaceAll("<","&lt;")
+          .replaceAll(">","&gt;")
+          .replaceAll('"',"&quot;")
+          .replaceAll("'","&#039;");
+      }
+      function toastify(message, tone="accent"){
+        toast.classList.add("show");
+        toastMsg.innerHTML = message;
+        const bar = toast.querySelector(".bar");
+        bar.style.background =
+          tone==="danger" ? "var(--danger)" :
+          tone==="warn" ? "var(--warn)" :
+          tone==="ok" ? "var(--ok)" : "var(--accent)";
+        clearTimeout(toast._t);
+        toast._t = setTimeout(()=> toast.classList.remove("show"), 2400);
+      }
+      function save(){
+        localStorage.setItem(LS_KEY, JSON.stringify(tickets));
+      }
+      function load(){
+        try{
+          const raw = localStorage.getItem(LS_KEY);
+          tickets = raw ? JSON.parse(raw) : [];
+          if(!Array.isArray(tickets)) tickets = [];
+        }catch(e){
+          tickets = [];
+        }
+        const last = localStorage.getItem(LS_EXPORT);
+        statExport.textContent = last ? last : "—";
+      }
+      function computeStats(){
+        statTotal.textContent = String(tickets.length);
+        const openish = tickets.filter(t => !["Resolvido","Fechado"].includes(t.Status)).length;
+        statOpen.textContent = String(openish);
+        const high = tickets.filter(t => t.Prioridade === "Alta").length;
+        statHigh.textContent = String(high);
+      }
+      function chipPriority(p){
+        const cls = p === "Alta" ? "high" : (p === "Média" ? "med" : "low");
+        return `<span class="chip ${cls}"><span class="miniDot" aria-hidden="true"></span>${escapeHtml(p)}</span>`;
+      }
+      function applyFilters(list){
+        const qq = q.value.trim().toLowerCase();
+        const filial = fFilial.value;
+        const status = fStatus.value;
+        const prio = fPrioridade.value;
+
+        return list.filter(t => {
+          if(filial && t.Filial !== filial) return false;
+          if(status && t.Status !== status) return false;
+          if(prio && t.Prioridade !== prio) return false;
+
+          if(qq){
+            const hay = [
+              t.Data_Abertura, t.Filial, t.Setor, t.Colaborador, t.Categoria,
+              t.Descricao_do_Problema, t.Solucao, t.Prioridade, t.Status, t.Responsavel_TI
+            ].join(" ").toLowerCase();
+            if(!hay.includes(qq)) return false;
+          }
+          return true;
+        });
+      }
+      function render(){
+        const filtered = applyFilters([...tickets].sort((a,b) => (b.createdAt - a.createdAt)));
+        countLabel.innerHTML = `<strong>${filtered.length}</strong> exibidos`;
+
+        tbody.innerHTML = filtered.map(t => `
+          <tr data-id="${escapeHtml(t.id)}">
+            <td>${escapeHtml(t.Data_Abertura || "")}</td>
+            <td>${escapeHtml(t.Filial || "")}</td>
+            <td>${escapeHtml(t.Setor || "")}</td>
+            <td>${escapeHtml(t.Colaborador || "")}</td>
+            <td>${escapeHtml(t.Categoria || "")}</td>
+            <td>${escapeHtml(t.Descricao_do_Problema || "")}</td>
+            <td>${escapeHtml(t.Solucao || "")}</td>
+            <td>${chipPriority(t.Prioridade)}</td>
+            <td>${escapeHtml(t.Status || "")}</td>
+            <td>${escapeHtml(t.Responsavel_TI || "")}</td>
+            <td style="text-align:right">
+              <div class="rowActions">
+                <button class="iconBtn" type="button" data-action="edit" title="Editar">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button class="iconBtn" type="button" data-action="delete" title="Excluir">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 6V4h8v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join("");
+
+        computeStats();
+      }
+      function validateForm(){
+        // Native validation first
+        if(!form.checkValidity()){
+          const firstInvalid = form.querySelector(":invalid");
+          if(firstInvalid) firstInvalid.focus({preventScroll:false});
+          toastify('Revise os campos: há itens <strong>obrigatórios</strong> faltando.', "warn");
+          return false;
+        }
+        return true;
+      }
+      function getFormTicket(){
+        /** @type {Ticket} */
+        const t = {
+          id: uid(),
+          Data_Abertura: document.getElementById("Data_Abertura").value,
+          Filial: document.getElementById("Filial").value,
+          Setor: document.getElementById("Setor").value,
+          Colaborador: document.getElementById("Colaborador").value.trim(),
+          Categoria: document.getElementById("Categoria").value.trim(),
+          Descricao_do_Problema: document.getElementById("Descricao_do_Problema").value.trim(),
+          Solucao: document.getElementById("Solucao").value.trim(),
+          Prioridade: document.getElementById("Prioridade").value,
+          Status: document.getElementById("Status").value,
+          Responsavel_TI: document.getElementById("Responsavel_TI").value.trim(),
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+        return t;
+      }
+      function setFormDefaults(){
+        const dateEl = document.getElementById("Data_Abertura");
+        if(!dateEl.value) dateEl.value = todayISO();
+
+        const statusEl = document.getElementById("Status");
+        if(!statusEl.value) statusEl.value = "Aberto";
+
+        const prioEl = document.getElementById("Prioridade");
+        if(!prioEl.value) prioEl.value = "Média";
+      }
+      function resetForm(){
+        form.reset();
+        setFormDefaults();
+        document.getElementById("Filial").focus();
+      }
+      function exportXLS(){
+        // Build an HTML table with a BOM for Excel
+        const rows = [...tickets].sort((a,b) => (a.createdAt - b.createdAt));
+
+        const headers = [
+          "Data_Abertura","Filial","Setor","Colaborador","Categoria",
+          "Descrição do Problema","Solução","Prioridade","Status","Responsável TI"
+        ];
+
+        const htmlTable =
+        `<table border="1">
+          <thead><tr>${headers.map(h=>`<th>${escapeHtml(h)}</th>`).join("")}</tr></thead>
+          <tbody>
+            ${rows.map(t => `
+              <tr>
+                <td>${escapeHtml(t.Data_Abertura||"")}</td>
+                <td>${escapeHtml(t.Filial||"")}</td>
+                <td>${escapeHtml(t.Setor||"")}</td>
+                <td>${escapeHtml(t.Colaborador||"")}</td>
+                <td>${escapeHtml(t.Categoria||"")}</td>
+                <td>${escapeHtml(t.Descricao_do_Problema||"")}</td>
+                <td>${escapeHtml(t.Solucao||"")}</td>
+                <td>${escapeHtml(t.Prioridade||"")}</td>
+                <td>${escapeHtml(t.Status||"")}</td>
+                <td>${escapeHtml(t.Responsavel_TI||"")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>`;
+
+        const now = new Date();
+        const pad = (n)=> String(n).padStart(2,"0");
+        const stamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+        const filename = `HelpDesk_Chamados_${stamp}.xls`;
+
+        const bom = "\uFEFF";
+        const content = `
+          <html>
+          <head><meta charset="utf-8" /></head>
+          <body>${htmlTable}</body>
+          </html>
+        `;
+
+        const blob = new Blob([bom + content], {type:"application/vnd.ms-excel;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+
+        const human = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        localStorage.setItem(LS_EXPORT, human);
+        statExport.textContent = human;
+
+        toastify(`Exportado: <strong>${escapeHtml(filename)}</strong>`, "ok");
+      }
+      function editTicket(id){
+        const t = tickets.find(x => x.id === id);
+        if(!t) return;
+
+        // Minimal prompt-based editor (simples e robusto sem modal pesado)
+        const newStatus = prompt("Editar Status:", t.Status);
+        if(newStatus === null) return;
+
+        const newResp = prompt("Editar Responsável TI:", t.Responsavel_TI);
+        if(newResp === null) return;
+
+        const newPrio = prompt("Editar Prioridade (Baixa, Média, Alta):", t.Prioridade);
+        if(newPrio === null) return;
+
+        const newSolucao = prompt("Editar Solução:", t.Solucao || "");
+        if(newSolucao === null) return;
+
+        const allowedPrio = ["Baixa","Média","Alta"];
+        const prio = allowedPrio.includes((newPrio || "").trim()) ? (newPrio || "").trim() : t.Prioridade;
+
+        t.Status = (newStatus || "").trim() || t.Status;
+        t.Responsavel_TI = (newResp || "").trim() || t.Responsavel_TI;
+        t.Prioridade = prio;
+        t.Solucao = (newSolucao || "").trim();
+        t.updatedAt = Date.now();
+
+        save();
+        render();
+        toastify("Chamado atualizado.", "ok");
+      }
+      function deleteTicket(id){
+        const t = tickets.find(x => x.id === id);
+        if(!t) return;
+
+        const ok = confirm(`Excluir este chamado de ${t.Colaborador} (${t.Filial})?`);
+        if(!ok) return;
+
+        tickets = tickets.filter(x => x.id !== id);
+        save();
+        render();
+        toastify("Chamado excluído.", "danger");
+      }
+
+      // Events
+      form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        if(!validateForm()) return;
+        const t = getFormTicket();
+</> JavaScript
+        await fetch("/chamados", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(t)
+});
+carregarChamados();
+async function carregarChamados() {
+  const res = await fetch("/chamados");
+  tickets = await res.json();
+  render();
+}
+async function carregarChamados() {
+  const res = await fetch("/chamados");
+  tickets = await res.json();
+  render();
+}
+// save();
+// localStorage
+
+carregarChamados();
+        render();
+        toastify("Chamado registrado e salvo localmente.", "ok");
+        resetForm();
+      });
+
+      btnReset.addEventListener("click", ()=>{
+        resetForm();
+        toastify("Formulário limpo.", "accent");
+      });
+
+      btnExport.addEventListener("click", ()=>{
+        if(tickets.length === 0){
+          toastify("Nada para exportar ainda.", "warn");
+          return;
+        }
+        exportXLS();
+      });
+
+      btnPrint.addEventListener("click", ()=> window.print());
+
+      btnClear.addEventListener("click", ()=>{
+        if(tickets.length === 0){
+          toastify("Já está vazio.", "warn");
+          return;
+        }
+        const ok = confirm("Tem certeza que deseja apagar TODOS os chamados deste navegador?");
+        if(!ok) return;
+
+        tickets = [];
+        save();
+        render();
+        toastify("Todos os chamados foram apagados.", "danger");
+      });
+
+      btnSeed.addEventListener("click", ()=>{
+        const sample = [
+          {
+            Data_Abertura: todayISO(),
+            Filial: "PE",
+            Setor: "Engenharia",
+            Colaborador: "Ana Lima",
+            Categoria: "Acesso VPN",
+            Descricao_do_Problema: "Usuária não consegue autenticar na VPN. Erro após MFA. Impacto: sem acesso ao sistema interno.",
+            Solucao: "Reconfiguração do perfil VPN e reset do MFA.",
+            Prioridade: "Alta",
+            Status: "Aberto",
+            Responsavel_TI: "TI - Suporte N1"
+          },
+          {
+            Data_Abertura: todayISO(),
+            Filial: "CE",
+            Setor: "Administrativo",
+            Colaborador: "Bruno Almeida",
+            Categoria: "E-mail",
+            Descricao_do_Problema: "Outlook travando ao iniciar. Já refeito perfil, persiste. Precisa de análise no add-in.",
+            Solucao: "Desabilitado add-in problemático e reinstalado Outlook.",
+            Prioridade: "Média",
+            Status: "Em andamento",
+            Responsavel_TI: "TI - N2"
+          },
+          {
+            Data_Abertura: todayISO(),
+            Filial: "PE-IAT",
+            Setor: "IAT",
+            Colaborador: "Carlos Souza",
+            Categoria: "Impressora",
+            Descricao_do_Problema: "Impressora da recepção não imprime em rede. Luz piscando e fila presa.",
+            Solucao: "Reiniciado serviço de spooler e trocado cabo de rede.",
+            Prioridade: "Baixa",
+            Status: "Aguardando fornecedor",
+            Responsavel_TI: "TI - Infra"
+          }
+        ];
+
+        sample.forEach(s=>{
+          tickets.unshift({
+            id: uid(),
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            ...s
+          });
+        });
+
+        save();
+        render();
+        toastify("Exemplos inseridos.", "ok");
+      });
+
+      [q, fFilial, fStatus, fPrioridade].forEach(el=>{
+        el.addEventListener("input", render);
+        el.addEventListener("change", render);
+      });
+
+      tbody.addEventListener("click", (e)=>{
+        const btn = e.target.closest("button[data-action]");
+        if(!btn) return;
+
+        const tr = e.target.closest("tr[data-id]");
+        if(!tr) return;
+
+        const id = tr.getAttribute("data-id");
+        const action = btn.getAttribute("data-action");
+
+        if(action === "edit") editTicket(id);
+        if(action === "delete") deleteTicket(id);
+      });
+
+      // IntersectionObserver for reveal
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach((en)=>{
+          if(en.isIntersecting){
+            en.target.classList.add("in");
+            io.unobserve(en.target);
+          }
+        });
+      }, {threshold: .12});
+
+      document.querySelectorAll(".reveal").forEach((el, idx)=>{
+        el.style.animationDelay = (Number(el.style.animationDelay?.replace("s","")) || 0) + (idx*0.02) + "s";
+        io.observe(el);
+      });
+
+      // Init
+      load();
+      setFormDefaults();
+      render();
+
+      // Storage status
+      const storageStatus = document.getElementById("storageStatus");
+      try{
+        localStorage.setItem("__test","1");
+        localStorage.removeItem("__test");
+        storageStatus.textContent = "ativo";
+      }catch{
+        storageStatus.textContent = "indisponível";
+        toastify("LocalStorage indisponível neste navegador. Os dados podem não ser salvos.", "warn");
+      }
+    })();
+  </script>
+</body>
+</html>
